@@ -48,7 +48,7 @@ We init the Annotator. The first argument is the name of the file or the name of
 
 	an = Annotator("my-annotations", labels, useMongodb=True, dirPath="/home/hayj/tmp")
 
-Here we start the UI, so you will have one data on the left and labels to manually edit on the right. You can click the right arrow to switch to the next data, or return to the previous.
+Here we start the UI, so you will have one data on the left and labels on the right to be manually edited. You can click the right arrow button to switch to the next data, or return to the previous.
 
 	an.start(dataGenerator())
 
