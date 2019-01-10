@@ -1,3 +1,6 @@
+
+# pew in st-venv python ~/Workspace/Python/Datasets/Annotator/annotator/annot.py
+
 from systemtools.basics import *
 from datatools.dataencryptor import *
 try:
@@ -5,15 +8,15 @@ try:
 except: pass
 from datastructuretools.hashmap import *
 from tkinter import Tk
-from annotator.annotatorui import *
+from annotator.ui import *
 
 class Annotator:
 	def __init__\
 	(
 		self,
 		identifier,
-		generator,
 		labels,
+		dirPath=None,
 		taskDescription=None,
 		useMongodb=True,
 		logger=None,
@@ -35,13 +38,13 @@ class Annotator:
 			TODO make scales default as None to be able to disable the value if the user doesn't know what to label...
 
 		"""
+		self.dirPath = dirPath
 		self.taskDescription = taskDescription
 		self.logger = logger
 		self.verbose = verbose
 		self.identifier = identifier
-		self.generator = self.threadedGenerator = threadGen(generator, maxsize=100,
-			logger=self.logger, verbose=self.verbose)
-		self.labels = labels
+		self.generator = None
+		self.labels = sortByKey(labels)
 		self.useMongodb = useMongodb
 		self.annotatorUI = None
 		self.host = host
@@ -62,24 +65,30 @@ class Annotator:
 		self.data = SerializableDict\
 		(
 			name=self.identifier,
+			dirPath=self.dirPath,
 	        useMongodb=self.useMongodb,
 	        logger=self.logger,
 	        verbose=self.verbose,
-	        serializeEachNAction=3,
+	        serializeEachNAction=1,
 	        host=self.host, user=self.user, password=self.password,
 	        useLocalhostIfRemoteUnreachable=False,
 	        mongoDbName=self.mongoDbName,
         	mongoIndex="id",
 		)
 
+	def getAlreadySeen():
+		return self.data.keys()
+
 	def startUI(self):
 		root = Tk()
-		root.geometry("1200x800+600+100")
+		root.geometry("1200x800") #+600+100
 		self.annotatorUI = AnnotatorUI(rightCallback=self.next, leftCallback=self.previous, logger=self.logger, verbose=self.verbose, taskDescription=self.taskDescription)
 		self.annotatorUI.right()
 		root.mainloop()
 
-	def start(self):
+	def start(self, generator):
+		self.generator = threadGen(generator, maxsize=100,
+			logger=self.logger, verbose=self.verbose)
 		self.startUI()
 
 	def reset(self):
@@ -206,7 +215,7 @@ if __name__ == "__main__":
 		"f": {"title": "They are the samethe samethe same source same source", "text": "Same", "type": LABEL_TYPE.checkbutton, "default": True},
 	}
 
-	print(bool)
 	an = Annotator("test", dataGenerator(), labels, taskDescription="aaaa")
+	print("a")
 	an.reset()
 	an.start()

@@ -1,4 +1,4 @@
-# pew in st-venv python ~/Workspace/Python/Utils/DatabaseTools/databasetools/tkintertest.py
+
 
 
 from tkinter import Tk, Text, BOTH, CENTER, LEFT, Message, font, PhotoImage, Entry, Scale, HORIZONTAL, Checkbutton, INSERT, DISABLED, Scrollbar, IntVar
@@ -13,6 +13,13 @@ import enum
 # checkbutton has: default (boolean), shorttitle (facultative, if None, the title will be taken)
 LABEL_TYPE = enum.Enum("LABEL_TYPE", "scale option entry, checkbutton")
 
+
+def tkStripExtra(text):
+	charList = [text[j] for j in range(len(text)) if ord(text[j]) in range(65536)]
+	text = ''
+	for j in charList:
+		text = text + j
+	return text
 
 class AnnotatorUI(Frame):
 	def __init__(self, logger=None, verbose=True, toolDescription="This tool allow you to labelize data one by one. Use left/right keys or buttons below to switch to another data or come back to the previous.", taskDescription=None,
@@ -83,6 +90,8 @@ class AnnotatorUI(Frame):
 		self.textFrame.rowconfigure(0, weight=0)
 		self.textFrame.rowconfigure(1, weight=1)
 		# For each text:
+		if not isinstance(texts, list):
+			texts = [texts]
 		nbColumns = len(texts)
 		for i in range(nbColumns):
 			self.textFrame.columnconfigure(i, weight=1)
@@ -90,7 +99,7 @@ class AnnotatorUI(Frame):
 			try:
 				# We add the head message:
 				if dictContains(current, "title"):
-					headMessage = Message(self.textFrame, text=current["title"], **self.headMessagesOption)
+					headMessage = Message(self.textFrame, text=tkStripExtra(current["title"]), **self.headMessagesOption)
 					headMessage.grid(row=0, column=i, sticky='nwe', padx=2, pady=0)
 				# We create the area for the text:
 				textAreaFrame = Frame(self.textFrame)
@@ -105,7 +114,7 @@ class AnnotatorUI(Frame):
 				# We create the Text widget in:
 				textWidget = Text(textAreaFrame)
 				textWidget.grid(row=0, column=0, sticky="news")
-				textWidget.insert(INSERT, current["text"])
+				textWidget.insert(INSERT, tkStripExtra(current["text"]))
 				textWidget.config(state=DISABLED)
 				# We make the scroll bar:
 				scrollBar = Scrollbar(textAreaFrame, command=textWidget.yview)
