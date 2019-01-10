@@ -13,11 +13,11 @@ This tool is actually in beta, it works but a lot of functionnalities has to be 
 
 ## Usage
 
-First we import the lib:
+First import the lib:
 
 	from annotator.annot import *
 
-We get all data:
+Get your data:
 
 	data = \
 	[
@@ -44,11 +44,11 @@ Define your labels:
 		"popular": {"title": "The author is popular", "shorttitle": "Popular author", "type": LABEL_TYPE.checkbutton},
 	}
 
-We init the Annotator. The first argument is the name of the file or the name of the mongo collection. Here we store all annotations in a pickle file but you can also use mongodb if you set host, user, and password:
+Init the Annotator. The first argument is the name of the file or the name of the mongo collection. Here we store all annotations in a pickle file but you can also use mongodb if you set host, user, and password:
 
 	an = Annotator("my-annotations", labels, useMongodb=True, dirPath="/home/hayj/tmp")
 
-Here we start the UI, so you will have one data on the left and labels on the right to be manually edited. You can click the right arrow button to switch to the next data, or return to the previous.
+Here you start the UI, so you will have one data on the left and labels on the right to be manually edited. You can click the right arrow button to switch to the next data, or return to the previous.
 
 	an.start(dataGenerator())
 
