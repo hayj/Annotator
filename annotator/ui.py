@@ -1,8 +1,10 @@
 
 
-
-from tkinter import Tk, Text, BOTH, CENTER, LEFT, Message, font, PhotoImage, Entry, Scale, HORIZONTAL, Checkbutton, INSERT, DISABLED, Scrollbar, IntVar
-from tkinter.ttk import Frame, Label, Style, Button, Separator
+try:
+	from tkinter import Tk, Text, BOTH, CENTER, LEFT, Message, font, PhotoImage, Entry, Scale, HORIZONTAL, Checkbutton, INSERT, DISABLED, Scrollbar, IntVar, BooleanVar, Radiobutton
+	from tkinter.ttk import Frame, Label, Style, Button, Separator
+except Exception as e:
+	print(e)
 from systemtools.logger import *
 
 
@@ -11,7 +13,7 @@ import enum
 # scale has: default, resolution, from, to
 # option has: options, default
 # checkbutton has: default (boolean), shorttitle (facultative, if None, the title will be taken)
-LABEL_TYPE = enum.Enum("LABEL_TYPE", "scale option entry, checkbutton")
+LABEL_TYPE = enum.Enum("LABEL_TYPE", "scale radiobutton entry checkbutton")
 
 
 def tkStripExtra(text):
@@ -131,7 +133,10 @@ class AnnotatorUI(Frame):
 			if isinstance(currentEntry, Scale):
 				value = currentEntry.get()
 			elif isinstance(currentEntry, IntVar):
-				value = True if currentEntry.get() == 1 else False
+				value = currentEntry.get()
+			elif isinstance(currentEntry, BooleanVar):
+				print("aaaaaaaaa")
+				value = currentEntry.get()
 			else:
 				logError("Not yet implemented!", self)
 			data[id] = value
@@ -175,7 +180,7 @@ class AnnotatorUI(Frame):
 					# We save the entry:
 					self.labelEntries.append(currentEntry)
 				elif label["type"] == LABEL_TYPE.checkbutton:
-					var = IntVar()
+					var = BooleanVar()
 					currentEntry = Checkbutton\
 					(
 						self.labelFrame,
@@ -186,6 +191,29 @@ class AnnotatorUI(Frame):
 						currentEntry.select()
 					# We save the entry:
 					self.labelEntries.append(var)
+				elif label["type"] == LABEL_TYPE.radiobutton:
+					vals = []
+					etiqs = []
+					for k, v in label["options"].items():
+						vals.append(k)
+						etiqs.append(v)
+					var = IntVar()
+					var.set(vals[1])
+					currentEntry = []
+					for i in range(len(vals)):
+						currentEtiq = etiqs[i]
+						currentVal = vals[i]
+						c = Radiobutton\
+						(
+							self.labelFrame,
+							text=currentEtiq,
+							variable=var,
+							value=currentVal,
+						)
+						currentEntry.append(c)
+						if dictContains(label, "default") and label["default"] == currentVal:
+							c.select()
+					self.labelEntries.append(var)
 				# We save the id:
 				self.labelIds.append(id)
 				# We grid the message:
@@ -195,7 +223,12 @@ class AnnotatorUI(Frame):
 					i += 1
 				# We grid the entry:
 				self.labelFrame.rowconfigure(i, weight=1)
-				currentEntry.grid(row=i, column=0, sticky="nsew")
+				if isinstance(currentEntry, list):
+					for c in currentEntry:
+						c.grid(row=i, column=0, sticky="nsw")
+						i += 1
+				else:
+					currentEntry.grid(row=i, column=0, sticky="nsew")
 				i += 1
 				# We make a separator:
 				self.labelFrame.rowconfigure(i, weight=1)

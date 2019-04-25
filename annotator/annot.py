@@ -5,17 +5,17 @@ from systemtools.basics import *
 from datatools.dataencryptor import *
 try:
 	from systemtools.hayj import *
+	from tkinter import Tk
+	from annotator.ui import *
 except: pass
 from datastructuretools.hashmap import *
-from tkinter import Tk
-from annotator.ui import *
 
 class Annotator:
 	def __init__\
 	(
 		self,
 		identifier,
-		labels,
+		labels=None,
 		dirPath=None,
 		taskDescription=None,
 		useMongodb=True,
@@ -25,6 +25,7 @@ class Annotator:
 		user=None,
 		password=None,
 		mongoDbName=None,
+		databaseRoot=None,
 	):
 		"""
 			The generator must throw dict looking:
@@ -44,7 +45,9 @@ class Annotator:
 		self.verbose = verbose
 		self.identifier = identifier
 		self.generator = None
-		self.labels = sortByKey(labels)
+		self.labels = labels
+		if self.labels is not None:
+			self.labels = sortByKey(labels)
 		self.useMongodb = useMongodb
 		self.annotatorUI = None
 		self.host = host
@@ -54,14 +57,16 @@ class Annotator:
 		self.validityFuncts = dict()
 		self.ids = []
 		self.index = None
+		self.databaseRoot = databaseRoot
 		if self.useMongodb and self.host is None and self.user is None and self.password is None and self.mongoDbName is None:
 			try:
 				(self.user, self.password, self.host) = getAnnotatorMongoAuth(logger=self.logger)
 				self.mongoDbName = "annotator"
+				self.databaseRoot = "annotator"
 			except Exception as e:
 				logException(e, self)
 				logError("A local storage of labels will be used.", self)
-				self.useMongodb
+				self.useMongodb = False
 		self.data = SerializableDict\
 		(
 			name=self.identifier,
@@ -74,9 +79,13 @@ class Annotator:
 	        useLocalhostIfRemoteUnreachable=False,
 	        mongoDbName=self.mongoDbName,
         	mongoIndex="id",
+        	databaseRoot=self.databaseRoot,
 		)
 
-	def getAlreadySeen():
+	def getData(self):
+		return self.data
+
+	def getAlreadySeen(self):
 		return self.data.keys()
 
 	def startUI(self):
