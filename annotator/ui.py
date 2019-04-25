@@ -135,7 +135,6 @@ class AnnotatorUI(Frame):
 			elif isinstance(currentEntry, IntVar):
 				value = currentEntry.get()
 			elif isinstance(currentEntry, BooleanVar):
-				print("aaaaaaaaa")
 				value = currentEntry.get()
 			else:
 				logError("Not yet implemented!", self)
