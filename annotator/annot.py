@@ -71,16 +71,22 @@ class Annotator:
 		(
 			name=self.identifier,
 			dirPath=self.dirPath,
-	        useMongodb=self.useMongodb,
-	        logger=self.logger,
-	        verbose=self.verbose,
-	        serializeEachNAction=1,
-	        host=self.host, user=self.user, password=self.password,
-	        useLocalhostIfRemoteUnreachable=False,
-	        mongoDbName=self.mongoDbName,
-        	mongoIndex="id",
-        	databaseRoot=self.databaseRoot,
+			useMongodb=self.useMongodb,
+			logger=self.logger,
+			verbose=self.verbose,
+			serializeEachNAction=1,
+			host=self.host, user=self.user, password=self.password,
+			useLocalhostIfRemoteUnreachable=False,
+			mongoDbName=self.mongoDbName,
+			mongoIndex="id",
+			databaseRoot=self.databaseRoot,
 		)
+
+
+	def __len__(self):
+		return self.size()
+	def size(self):
+		return len(self.data)
 
 	def getData(self):
 		return self.data
