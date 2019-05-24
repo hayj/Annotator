@@ -3,10 +3,10 @@
 
 from systemtools.basics import *
 from datatools.dataencryptor import *
+from annotator.ui import *
 try:
 	from systemtools.hayj import *
 	from tkinter import Tk
-	from annotator.ui import *
 except: pass
 from datastructuretools.hashmap import *
 
