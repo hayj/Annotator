@@ -46,7 +46,7 @@ Define your labels:
 
 Init the Annotator. The first argument is the name of the file or the name of the mongo collection. Here we store all annotations in a pickle file but you can also use mongodb if you set host, user, and password:
 
-	an = Annotator("my-annotations", labels, useMongodb=True, dirPath="/home/hayj/tmp")
+	an = Annotator("my-annotations", labels, useMongodb=False, dirPath="/home/hayj/tmp")
 
 Here you start the UI, so you will have one data on the left and labels on the right to be manually edited. You can click the right arrow button to switch to the next data, or return to the previous.
 
@@ -55,3 +55,7 @@ Here you start the UI, so you will have one data on the left and labels on the r
 Screenshot of the UI:
 
 ![alt text](ui.png "Logo Title Text 1")
+
+End finally print your labeled data:
+
+	print(list(an.data.items()))

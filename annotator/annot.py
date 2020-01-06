@@ -28,9 +28,6 @@ class Annotator:
 		databaseRoot=None,
 	):
 		"""
-			The generator must throw dict looking:
-			{id: "a", "text": "Something to print...",
-			"firstLabel": int, "secondLabel": bool}
 
 			If id is None, hash(<text>) will be used.
 
@@ -102,6 +99,11 @@ class Annotator:
 		root.mainloop()
 
 	def start(self, generator):
+		"""
+			The generator must throw dict looking:
+			{id: "a", "content": {"title": "t", text": "Something to print..."},
+			"firstLabel": int, "secondLabel": bool}
+		"""
 		self.generator = threadGen(generator, maxsize=100,
 			logger=self.logger, verbose=self.verbose)
 		self.startUI()
@@ -124,7 +126,9 @@ class Annotator:
 			toInsert = self.annotatorUI.getLabelsValues()
 			currentId = self.ids[self.index]
 			content = self.currentContent
+			meta = self.currentMeta
 			toInsert["content"] = content
+			toInsert["meta"] = meta
 			# We update it:
 			self.data[currentId] = toInsert
 		# Finally we load the new content:
@@ -133,14 +137,19 @@ class Annotator:
 		else:
 			newIndex = self.index + inc
 		if newIndex >= 0:
-			newContent, newLabels = None, None
+			newContent, newLabels, newMeta = None, None, None
 			# We get new values from the generator:
 			if self.index is None or newIndex == len(self.ids):
 				try:
 					# We get data:
 					newElement = next(self.generator)
 					newContent = newElement["content"]
-					theNewId = newElement["id"]
+					if dictContains(newElement, "meta"):
+						newMeta = newElement["meta"]
+					if not dictContains(newElement, "id"):
+						theNewId = hash(newElement["content"]["text"])
+					else:
+						theNewId = newElement["id"]
 					newLabels = self.labels
 					# We update ids:
 					self.ids.append(theNewId)
@@ -154,7 +163,7 @@ class Annotator:
 			# Else we reload the already displayed element:
 			else:
 				theNewId = self.ids[newIndex]
-				(newContent, newLabels) = self.getElementAndLabelsById(theNewId)
+				(newContent, newLabels, newMeta) = self.getElementAndLabelsById(theNewId)
 				# We update the index:
 				self.index = newIndex
 			if newLabels is not None:
@@ -163,6 +172,7 @@ class Annotator:
 				self.annotatorUI.initTextFrame(newContent)
 				# We update the current content:
 				self.currentContent = newContent
+				self.currentMeta = newMeta
 
 	def getElementAndLabelsById(self, id):
 		if self.data.has(id):
@@ -178,7 +188,10 @@ class Annotator:
 			for labelId, value in self.labels.items():
 				if labelId not in labels:
 					labels[labelId] = self.labels[labelId]
-			return (data["content"], sortByKey(labels))
+			meta = None
+			if dictContains(data, "meta"):
+				meta = data["meta"]
+			return (data["content"], sortByKey(labels), meta)
 		else:
 			logError(id + " not found!", self)
 		

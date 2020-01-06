@@ -29,7 +29,9 @@ if __name__ == "__main__":
 	}
 	
 	# We init the Annotator. The first argument is the name of the file or the name of the mongo collection. Here we store all annotations in a pickle file but you can also use mongodb if you set host, user, and password:
-	an = Annotator("my-annotations", labels, useMongodb=True, dirPath="/home/hayj/tmp")
+	an = Annotator("my-annotations", labels, useMongodb=False, dirPath="/home/hayj/tmp")
 	an.reset()
 	# Here we start the UI, so you will have one data on the left and labels to manually edit on the right. You can click the right arrow to switch to the next data, or return to the previous.
 	an.start(dataGenerator())
+	# End finally print your labeled data:
+	print(list(an.data.items()))
