@@ -56,6 +56,6 @@ Screenshot of the UI:
 
 ![alt text](ui.png "Logo Title Text 1")
 
-End finally print your labeled data:
+Finally print your labeled data:
 
 	print(list(an.data.items()))
